@@ -1,0 +1,187 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>Chu Muc 15</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="icon" href="data:,">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    p {  font-size: 1.2rem;}
+    body {  margin: 0;}
+    .topnav { overflow: hidden; background-color: #2f4468; color: white; font-size: 1.7rem; }
+    .content { padding: 20px; }
+    .card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }
+    .cards { max-width: 700px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .reading { font-size: 2.8rem; }
+    .packet { color: #bebebe; }
+    .card.temperature { color: #fd7e14; }
+    .card.humidity { color: #1b78e2; }
+
+    .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    }
+
+    .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+    }
+
+    .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    input:checked + .slider {
+    background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+    border-radius: 34px;
+    }
+
+    .slider.round:before {
+    border-radius: 50%;
+    }    
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <h3>Chu Muc 15</h3>
+  </div>
+  <div class="content">
+    <div class="cards">
+      <div class="card temperature">
+        <h4><i class="fas fa-thermometer-half"></i> BOARD #1 - TEMPERATURE</h4><p><span class="reading"><span id="t1"></span> &deg;C</span></p><p class="packet">Reading ID: <span id="rt1"></span></p>
+      </div>
+      <div class="card humidity">
+        <h4><i class="fas fa-tint"></i> BOARD #1 - HUMIDITY</h4><p><span class="reading"><span id="h1"></span> &percnt;</span></p><p class="packet">Reading ID: <span id="rh1"></span></p>
+      </div>
+    </div>
+  </div>
+
+</br>
+</br>
+  
+  <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1684203/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line"></iframe>
+  <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1684203/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+
+</br>
+</br>
+
+  <h2>Toggle Switch</h2>
+
+  <label class="switch" id="sw1">
+    <input type="checkbox" id="myCheck1" onclick = "myFunction1()">
+    <span class="slider round"></span>
+  </label>  
+
+</br>
+</br>
+
+  <h1>Range Slider Picture</h1>
+
+  <div class="slidecontainer" >
+    <input type="range" min="1" max="100" value="50" id="myRange">
+    <p>Value: <span id="demo"></span></p>
+  </div>
+
+  <div class="picker-container">
+    <div class="row">
+      <h3>ESP32 Color Picker</h3>
+    </div>
+    <input class="jscolor {onFineChange:'update(this)}" id="rgb">
+    <!-- <a class="button-picker" href="#" id="change_color" role="button" >Change Color</a>
+     -->
+     <button onclick="changColor()">Change</button>
+  </div>
+
+
+<script>
+  function changColor() {
+    var xhttp = new XMLHttpRequest();
+    var color = document.getElementById("rgb").value;
+    xhttp.open("GET", "/rgb?color=" + color);
+    xhttp.send();   
+  }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js">
+  function update(picker) {
+    document.getElementById('rgb').innerHTML = Math.round(picker.rgb[0]) + ', ' + Math.round(picker.rgb[1]) + ', ' + Math.round(picker.rgb[2]);
+  }
+</script>
+
+<script>
+var xhttp1 = new XMLHttpRequest();
+var xhttp2 = new XMLHttpRequest();
+
+xhttp1.onreadystatechange = function() {
+  const obj = JSON.parse(this.responseText);
+  var element1 = document.getElementById('t1'); 
+  element1.innerText = obj.temperature;
+  var element1 = document.getElementById('h1'); 
+  element1.innerText = obj.humidity;  
+}
+
+function myFunction1() {
+  var checkBox = document.getElementById("myCheck1");
+  if(checkBox.checked == true){
+    xhttp2.open("POST", "/sw1", true);
+    xhttp2.send("1");    
+  } else {
+    xhttp2.open("POST", "/sw1", true);
+    xhttp2.send("0");    
+  }
+}
+
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+  output.innerHTML = this.value;
+  xhttp2.open("POST", "/slider", true);
+  xhttp2.send(this.value);   
+}
+
+setInterval(function ( ) {
+  xhttp1.open("GET", "/dht11", true);
+  xhttp1.send();
+} , 1000);
+</script>
+</body>
+</html>
