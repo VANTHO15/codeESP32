@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<label>SSID: </label>
+<input type="text" id="ssid"><br><br>
+<label>PASS: </label>
+<input type="text" id="pass"><br><br>
+
+<button onclick="myFunction()">Send WIFI Info</button>
+
+<script>
+var xhttp1 = new XMLHttpRequest();
+
+function myFunction() {
+  var ssid = document.getElementById("ssid").value;
+  var pass = document.getElementById("pass").value;
+  var data = ssid + "/" + pass;
+  xhttp1.open("POST", "/post", true);
+  xhttp1.send(data);  
+}
+</script>
+
+</body>
+</html>
